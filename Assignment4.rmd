@@ -1,0 +1,102 @@
+---
+title: "Assignment4"
+NAME: "Vishal Pawar"
+output: html_document
+date: "2023-10-08"
+---
+
+```{r}
+library(fpp) #declare library fpp
+library(fpp2)#declare library fpp2
+library(TTR)#declare library TTR
+library(readxl)
+gold_price <- read_excel("C:/Rutgers/Subjects/Fall Sem/BF/Assignment/week 4/files/gold_price.xlsx")
+View(gold_price)
+DataFrame<- data.frame(gold_price$Date,gold_price$Price) #load data
+View(DataFrame)
+
+TimeSeries<-ts(DataFrame$gold_price.Price,start=c(2015,01),end=c(2020,07),frequency=12) #time series conversion
+plot(TimeSeries) #plot ts
+
+Acf(TimeSeries) #ACF PLOT
+
+mean_forecast <- meanf(TimeSeries,5) #Mean forecasting 5 ts points forecast
+plot(mean_forecast)
+
+naive_forecast <- naive(TimeSeries,5) #naive forecasting
+plot(naive_forecast)
+
+rwf_forecast <- rwf(TimeSeries,5) #rwf forecast
+
+rwf_forecast <- rwf(TimeSeries,5, drift=TRUE) # trend rwf drift
+plot(rwf_forecast)
+
+snaive_forecast <- snaive(TimeSeries,5) #seasonal naive
+plot(snaive_forecast)
+
+MA5_forecast <- ma(TimeSeries,order=5) #moving average order5
+MA9_forecast <- ma(TimeSeries,order=9) #moving average order 9
+plot(mean_forecast)
+
+lines(naive_forecast$mean,col="red")
+lines(rwf_forecast$mean,col="green")
+lines(snaive_forecast$mean,col="black")
+lines(MA5_forecast,col="Pink")
+lines(MA9_forecast,col="Blue")
+
+attributes(naive_forecast)
+
+
+ets_forecast <- ets(TimeSeries) #1 no trend seasonality smoothing 
+plot(ets_forecast)
+attributes(ets_forecast)
+ets_forecast$mse
+
+# HoltWinters
+HW_forecast <- HoltWinters(TimeSeries)  #2 both
+plot(HW_forecast)
+SSE_Simple <- HoltWinters(TimeSeries,beta=FALSE,gamma=FALSE)
+attributes(SSE_Simple)
+plot(SSE_Simple)
+SSE_Simple$SSE
+head(SSE_Simple$fitted)
+
+#Forecast
+forecast_rwf <- forecast(rwf_forecast, h=5)
+plot(forecast_rwf)
+
+forecast_SSE <- forecast(SSE_Simple, h=5)
+plot(forecast_SSE)
+
+forecast_HW <- forecast(HW_forecast, h=20)
+plot(forecast_HW)
+
+forecast_ETS <- forecast(ets_forecast, h=5)
+plot(forecast_ETS)
+
+forecast_MA5_forecast <- forecast(MA5_forecast, h=5)
+plot(forecast_MA5_forecast)
+
+lines(forecast_SSE$mean,col="red") #sse
+lines(forecast_HW$mean,col="green") #Holtwinters
+lines(forecast_ETS$mean,col="yellow") #ETS
+lines(MA5_forecast,col="pink") #Moving average order 5
+lines(MA9_forecast,col="blue") #moving average order 9
+lines(naive_forecast$mean,col="orange") #naive 
+lines(rwf_forecast$mean,col="purple") #rwf
+lines(snaive_forecast$mean,col="black") #seasonal naive
+
+#Accuracy measures
+accuracy(mean_forecast) #mean
+accuracy(naive_forecast) #naive
+accuracy(rwf_forecast) #rwf
+accuracy(snaive_forecast) #seasonal naive
+accuracy(forecast_MA5_forecast) #Moving average order 5
+accuracy(forecast_SSE) #SSE
+accuracy(forecast_HW) #Holt winters
+
+
+
+
+```
+
